@@ -1515,7 +1515,6 @@ function AssetNode({
   const [hover, setHover] = useState(false);
   const position = useMemo(() => vec(asset), [asset]);
   const quat = useMemo(() => surfaceQuat(position), [position]);
-  const ring = useRef<THREE.Mesh>(null);
   const body = useRef<THREE.Group>(null);
   const root = useRef<THREE.Group>(null);
   const orbiting = asset.kind === 'satellite';
