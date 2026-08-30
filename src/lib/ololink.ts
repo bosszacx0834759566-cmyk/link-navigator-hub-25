@@ -252,11 +252,11 @@ function generateSites(count: number, startIndex: number, seed: number): Asset[]
 }
 
 const GENERATED_ASSETS: Asset[] = [
-  // LEO constellation — 43 generated + 7 curated = 50 (global coverage)
+  // LEO constellation — 3 generated + 7 curated = 10 (focused coverage)
   ...generateFleet({
     kind: 'satellite',
     prefix: 'LEO',
-    count: 43,
+    count: 3,
     startIndex: 8,
     altMin: 500,
     altMax: 720,
@@ -268,7 +268,7 @@ const GENERATED_ASSETS: Asset[] = [
   // HAPS / Drone / GS operate as co-located clusters (site N = HAPS-N + Drone-N + GS-N):
   // HAPS flies 2–5 km above its drone (above the cloud deck), the drone stays
   // below the clouds, and the ground station sits 10–15 km away from the drone.
-  ...generateSites(18, 3, 4242),
+  ...generateSites(3, 3, 4242),
 ];
 
 export const ASSETS: Asset[] = [
