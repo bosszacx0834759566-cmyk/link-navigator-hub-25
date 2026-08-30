@@ -1515,7 +1515,6 @@ function AssetNode({
   const [hover, setHover] = useState(false);
   const position = useMemo(() => vec(asset), [asset]);
   const quat = useMemo(() => surfaceQuat(position), [position]);
-  const ring = useRef<THREE.Mesh>(null);
   const body = useRef<THREE.Group>(null);
   const root = useRef<THREE.Group>(null);
   const orbiting = asset.kind === 'satellite';
@@ -1549,13 +1548,6 @@ function AssetNode({
     if (body.current) {
       const target = selected ? 1.45 : hover ? 1.2 : 1;
       body.current.scale.lerp(new THREE.Vector3(target, target, target), 0.12);
-    }
-    if (ring.current) {
-      ring.current.lookAt(camera.position);
-      const p = (clock.elapsedTime * 0.55) % 1;
-      ring.current.scale.setScalar(1 + p * 2.6);
-      (ring.current.material as THREE.MeshBasicMaterial).opacity =
-        (1 - p) * (selected ? 0.55 : linking ? 0.42 : onRoute ? 0.28 : 0);
     }
   });
 
@@ -1631,17 +1623,6 @@ function AssetNode({
           <CustomerNode s={s} color={color} />
         )}
       </group>
-
-      <mesh ref={ring}>
-        <ringGeometry args={[s * 1.9, s * 2.2, 32]} />
-        <meshBasicMaterial
-          color={linking ? '#e0f2fe' : KIND_COLOR[asset.kind]}
-          transparent
-          opacity={0}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
 
       {tetherGeom && (
         // @ts-expect-error three line primitive
@@ -2203,29 +2184,6 @@ function SceneContent({
         ))}
       </Fade>
 
-      {layers.routes &&
-        visibleLinks.map((l) =>
-          ASSET_BY_ID[l.segment.from]?.kind === 'satellite' ? (
-            <DownlinkBeam
-              key={l.segment.id}
-              link={l}
-              live={live}
-              inWindow={state.windows[l.segment.to] === l.segment.from}
-              selected={selection?.type === 'link' && selection.id === l.segment.id}
-              highlighted={highlightIds.has(l.segment.id)}
-              onSelect={select}
-            />
-          ) : (
-            <LinkPath
-              key={l.segment.id}
-              link={l}
-              selected={selection?.type === 'link' && selection.id === l.segment.id}
-              onRoute={routeSegmentIds.has(l.segment.id)}
-              highlighted={highlightIds.has(l.segment.id)}
-              onSelect={select}
-            />
-          )
-        )}
 
       {/* AI rerouting: old path dissolves, new path draws itself in */}
       {layers.routes && detailed && previousRoute && previousRoute.length > 0 && (
