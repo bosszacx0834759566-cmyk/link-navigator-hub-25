@@ -1549,13 +1549,6 @@ function AssetNode({
       const target = selected ? 1.45 : hover ? 1.2 : 1;
       body.current.scale.lerp(new THREE.Vector3(target, target, target), 0.12);
     }
-    if (ring.current) {
-      ring.current.lookAt(camera.position);
-      const p = (clock.elapsedTime * 0.55) % 1;
-      ring.current.scale.setScalar(1 + p * 2.6);
-      (ring.current.material as THREE.MeshBasicMaterial).opacity =
-        (1 - p) * (selected ? 0.55 : linking ? 0.42 : onRoute ? 0.28 : 0);
-    }
   });
 
   /* label rendering is delegated to the decluttered screen-space layer */
