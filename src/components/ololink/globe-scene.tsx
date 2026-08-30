@@ -2184,29 +2184,6 @@ function SceneContent({
         ))}
       </Fade>
 
-      {layers.routes &&
-        visibleLinks.map((l) =>
-          ASSET_BY_ID[l.segment.from]?.kind === 'satellite' ? (
-            <DownlinkBeam
-              key={l.segment.id}
-              link={l}
-              live={live}
-              inWindow={state.windows[l.segment.to] === l.segment.from}
-              selected={selection?.type === 'link' && selection.id === l.segment.id}
-              highlighted={highlightIds.has(l.segment.id)}
-              onSelect={select}
-            />
-          ) : (
-            <LinkPath
-              key={l.segment.id}
-              link={l}
-              selected={selection?.type === 'link' && selection.id === l.segment.id}
-              onRoute={routeSegmentIds.has(l.segment.id)}
-              highlighted={highlightIds.has(l.segment.id)}
-              onSelect={select}
-            />
-          )
-        )}
 
       {/* AI rerouting: old path dissolves, new path draws itself in */}
       {layers.routes && detailed && previousRoute && previousRoute.length > 0 && (
