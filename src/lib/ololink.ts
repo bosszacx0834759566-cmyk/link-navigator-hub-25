@@ -165,10 +165,54 @@ function generateFleet(spec: FleetSpec): Asset[] {
 const KM_PER_DEG = 111;
 
 /**
+ * Curated land anchors for gateway sites — verified continental/coastal-city
+ * coordinates so ground stations never land in the ocean. Sites jitter a few
+ * km around these anchors; drones/HAPS then cluster around the ground station.
+ */
+const LAND_ANCHORS: ReadonlyArray<readonly [lat: number, lon: number]> = [
+  [39.74, -104.99],   // Denver, USA
+  [34.05, -118.24],   // Los Angeles, USA
+  [41.88, -87.63],    // Chicago, USA
+  [29.76, -95.37],    // Houston, USA
+  [47.61, -122.33],   // Seattle, USA
+  [19.43, -99.13],    // Mexico City, Mexico
+  [-23.55, -46.63],   // São Paulo, Brazil
+  [-33.45, -70.67],   // Santiago, Chile
+  [4.71, -74.07],     // Bogotá, Colombia
+  [51.51, -0.13],     // London, UK
+  [48.86, 2.35],      // Paris, France
+  [52.52, 13.4],      // Berlin, Germany
+  [41.9, 12.5],       // Rome, Italy
+  [40.42, -3.7],      // Madrid, Spain
+  [30.04, 31.24],     // Cairo, Egypt
+  [6.52, 3.38],       // Lagos, Nigeria
+  [-26.2, 28.05],     // Johannesburg, South Africa
+  [-1.29, 36.82],     // Nairobi, Kenya
+  [55.76, 37.62],     // Moscow, Russia
+  [25.2, 55.27],      // Dubai, UAE
+  [28.61, 77.21],     // New Delhi, India
+  [19.08, 72.88],     // Mumbai, India
+  [13.75, 100.52],    // Bangkok, Thailand
+  [1.35, 103.82],     // Singapore
+  [3.14, 101.69],     // Kuala Lumpur, Malaysia
+  [-6.21, 106.85],    // Jakarta, Indonesia
+  [31.23, 121.47],    // Shanghai, China
+  [39.9, 116.4],      // Beijing, China
+  [35.68, 139.69],    // Tokyo, Japan
+  [37.57, 126.98],    // Seoul, South Korea
+  [-33.87, 151.21],   // Sydney, Australia
+  [-37.81, 144.96],   // Melbourne, Australia
+  [45.42, -75.7],     // Ottawa, Canada
+  [55.68, 12.57],     // Copenhagen, Denmark
+  [59.91, 10.75],     // Oslo, Norway
+  [-34.6, -58.38],    // Buenos Aires, Argentina
+];
+
+/**
  * Generate co-located operation sites: each site N is a cluster of
  * HAPS-N (18–20 km, above the cloud deck), Drone-N (below the clouds,
  * 2–5 km horizontally from its HAPS) and GS-N (10–15 km from the drone).
- * Sites themselves are spread around the globe for worldwide coverage.
+ * Sites anchor to curated land coordinates so ground stations stay on land.
  */
 function generateSites(count: number, startIndex: number, seed: number): Asset[] {
   const rand = mulberry32(seed);
@@ -178,9 +222,10 @@ function generateSites(count: number, startIndex: number, seed: number): Asset[]
     const region = FLEET_REGIONS[i % FLEET_REGIONS.length]!;
     const healthOf = (): Health => (rand() < 0.88 ? 'NOMINAL' : rand() < 0.75 ? 'DEGRADED' : 'OFFLINE');
 
-    // Ground station anchor — sites spread across longitudes, mid-latitudes.
-    const gsLon = -180 + ((i + 0.5) / count) * 360 + (rand() - 0.5) * 14;
-    const gsLat = -45 + rand() * 100;
+    // Ground station anchor — curated land coordinate + small local jitter (≤ ~35 km).
+    const [aLat, aLon] = LAND_ANCHORS[i % LAND_ANCHORS.length]!;
+    const gsLat = aLat + (rand() - 0.5) * 0.6;
+    const gsLon = aLon + (rand() - 0.5) * 0.6;
 
     // Drone: 10–15 km from the ground station, below the cloud deck (3–6 km alt).
     const dBearing = rand() * Math.PI * 2;
