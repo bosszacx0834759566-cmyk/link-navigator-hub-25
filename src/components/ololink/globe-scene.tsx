@@ -1624,17 +1624,6 @@ function AssetNode({
         )}
       </group>
 
-      <mesh ref={ring}>
-        <ringGeometry args={[s * 1.9, s * 2.2, 32]} />
-        <meshBasicMaterial
-          color={linking ? '#e0f2fe' : KIND_COLOR[asset.kind]}
-          transparent
-          opacity={0}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
-
       {tetherGeom && (
         // @ts-expect-error three line primitive
         <line geometry={tetherGeom}>
